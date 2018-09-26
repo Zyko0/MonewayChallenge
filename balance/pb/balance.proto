@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package balance;
+
+service BalanceService {
+  rpc ManageBalance (BalanceRequest) returns (BalanceReply) {}
+}
+
+message BalanceRequest {
+  string AccountID = 1;
+  int64 Value = 2;
+  string Currency = 3;
+}
+
+message BalanceReply {
+  bool Completed = 1;
+  int64 Amount = 2;
+  string Currency = 3;
+}

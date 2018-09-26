@@ -6,6 +6,7 @@ import(
 
 	"google.golang.org/grpc"
 	transaction "github.com/Zyko0/MonewayChallenge/transaction/pb"
+	balance "github.com/Zyko0/MonewayChallenge/balance/pb"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/ptypes"
 	"fmt"
@@ -21,8 +22,9 @@ type TransactionJSON struct {
 }
 
 var transactionClient transaction.TransactionServiceClient
+var balanceClient balance.BalanceServiceClient
 
-func balance(c *gin.Context) {
+func getBalance(c *gin.Context) {
 
 }
 
@@ -61,16 +63,28 @@ func storeTransaction(c *gin.Context) {
 }
 
 func main() {
+	// Routes initialization
 	r := gin.Default()
 	r.POST("/createtransaction", storeTransaction)
 	r.POST("/updatetransaction", storeTransaction)
-	r.GET("/balance", balance)
+	r.GET("/balance", getBalance)
 	r.POST("/credit", credit)
 	r.POST("/debit", debit)
+
+	// Setup dial with transaction service
 	conn, err := grpc.Dial("localhost:3000", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("Dial failed: %v", err)
 	}
 	transactionClient = transaction.NewTransactionServiceClient(conn)
+
+	// Setup dial with balance service
+	conn, err = grpc.Dial("localhost:3001", grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("Dial failed: %v", err)
+	}
+	balanceClient = balance.NewBalanceServiceClient(conn)
+
+	// Listening
 	r.Run(":8080")
 }
