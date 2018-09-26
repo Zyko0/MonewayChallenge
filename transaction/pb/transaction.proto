@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package transaction;
+
+import "google/protobuf/timestamp.proto";
+
+service TransactionService {
+  rpc StoreTransaction (TransactionRequest) returns (TransactionReply) {}
+}
+
+message TransactionRequest {
+  int64 ID = 1;
+  string AccountID = 2;
+  google.protobuf.Timestamp CreatedAt = 3;
+  string Description = 4;
+  int64 Amount = 5;
+  string Currency = 6;
+  string Notes = 7;
+}
+
+message TransactionReply {
+  bool Completed = 1;
+}
