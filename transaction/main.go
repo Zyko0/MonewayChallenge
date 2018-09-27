@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/reflection"
 	"github.com/Zyko0/MonewayChallenge/transaction/pb"
 	"github.com/Zyko0/MonewayChallenge/balance/pb"
+	"github.com/Zyko0/MonewayChallenge/db"
 )
 
 type server struct{}
@@ -41,7 +42,7 @@ func (s *server) StoreTransaction(ctx context.Context, request *pb.TransactionRe
 	fmt.Println("content : " + request.String())
 	rep := &pb.TransactionReply{Completed:true}
 	// Storing the transaction into the database
-
+	db.StoreTransaction(request)
 	// Credit or debit the balance by sending a new request to BalanceService
 	balanceRequest := &balance.BalanceRequest{
 		AccountID:request.AccountID,

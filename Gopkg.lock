@@ -82,6 +82,7 @@
   name = "github.com/scylladb/gocqlx"
   packages = [
     ".",
+    "qb",
     "reflectx"
   ]
   revision = "d5caed56c3077d57270f424d63df3e650f55801a"
@@ -196,6 +197,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "be00ecdc214218537a2a6732a8d02ed48fb0d3ef8156f8e989ea5cdaabe23da6"
+  inputs-digest = "bb74b24d94a9833ef1f77401f9ffec90ebbd9e86ee04b28b26949789d81bfb6d"
   solver-name = "gps-cdcl"
   solver-version = 1
