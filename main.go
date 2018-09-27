@@ -7,6 +7,7 @@ import(
 	"google.golang.org/grpc"
 	transaction "github.com/Zyko0/MonewayChallenge/transaction/pb"
 	balance "github.com/Zyko0/MonewayChallenge/balance/pb"
+	"github.com/Zyko0/MonewayChallenge/db"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/ptypes"
 	"fmt"
@@ -63,6 +64,9 @@ func storeTransaction(c *gin.Context) {
 }
 
 func main() {
+	// Database initialization
+	db.Init()
+
 	// Routes initialization
 	r := gin.Default()
 	r.POST("/createtransaction", storeTransaction)
