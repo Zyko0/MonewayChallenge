@@ -1,0 +1,34 @@
+version: '2'
+services:
+  scylla:
+    image: "scylladb/scylla"
+    ports:
+      - "9042:9042"
+    volumes:
+      - /var/lib/scylla:/var/lib/scylla
+    restart: always
+  moneway-api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:8080"
+    links:
+      - scylla:db
+      - moneway-balance:balance
+      - moneway-transaction:transaction
+    depends_on:
+      - scylla
+    restart: always
+  moneway-balance:
+    build:
+      context: .
+      dockerfile: ./balance/Dockerfile
+    ports:
+      - "3001:3001"
+  moneway-transaction:
+    build:
+      context: .
+      dockerfile: ./transaction/Dockerfile
+    ports:
+      - "3000:3000"
