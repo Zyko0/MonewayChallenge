@@ -2,29 +2,39 @@ package db
 
 import (
 	"github.com/gocql/gocql"
-//	"github.com/scylladb/gocqlx"
-//	"github.com/scylladb/gocqlx/qb"
 	"log"
 	"fmt"
 )
 
-var balanceBaseQuery = `
-CREATE TABLE IF NOT EXISTS gocqlx_test.migrate_table (
-    testint int,
-    testuuid timeuuid,
-    PRIMARY KEY(testint, testuuid)
+var keyspaceCreationQuery = `
+CREATE KEYSPACE IF NOT EXISTS moneway
+WITH replication={'class': 'SimpleStrategy', 'replication_factor': 3}
+`
+
+var transactionBaseQuery = `
+CREATE TABLE IF NOT EXISTS moneway.transactions (
+    id int,
+    accountid text,
+    description text,
+    amount int,
+    currency text,
+    notes text,
+    createdat timeuuid,
+    PRIMARY KEY(id)
 )
 `
-var transactionBaseQuery = `
-CREATE TABLE IF NOT EXISTS gocqlx_test.migrate_table (
-    testint int,
-    testuuid timeuuid,
-    PRIMARY KEY(testint, testuuid)
+var balanceBaseQuery = `
+CREATE TABLE IF NOT EXISTS moneway.balances (
+    accountid text,
+    amount int,
+    currency text,
+    PRIMARY KEY(accountid)
 )
 `
 
 func Init() {
 	cluster := gocql.NewCluster("172.19.0.1","172.19.0.2","172.19.0.3","172.19.0.4")
+	cluster.Keyspace = "system"
 	cluster.DisableInitialHostLookup = true
 	cluster.ProtoVersion = 4
 	cluster.CQLVersion = "5.0.1"
@@ -34,15 +44,6 @@ func Init() {
 		log.Fatal(err)
 	}
 	fmt.Println("CONNECTED")
-	b := session.NewBatch(gocql.LoggedBatch)
-	b.Query(balanceBaseQuery)
-	b.Query(transactionBaseQuery)
-	/*_, _, err = gocqlx.CompileNamedQuery([]byte(balanceBaseQuery))
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, _, err = gocqlx.CompileNamedQuery([]byte(transactionBaseQuery))
-	if err != nil {
-		log.Fatal(err)
-	}*/
+	session.Query(transactionBaseQuery).Iter()
+	session.Query(balanceBaseQuery).Iter()
 }

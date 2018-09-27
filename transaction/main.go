@@ -49,8 +49,8 @@ func (s *server) StoreTransaction(ctx context.Context, request *pb.TransactionRe
 		Currency:request.Currency,
 	}
 	res, err := balanceClient.ManageBalance(ctx, balanceRequest)
-	if err != nil {
-		res.Completed = false
+	if err != nil || !res.Completed {
+		rep.Completed = false
 		return rep, err
 	}
 	return rep, nil
