@@ -43,6 +43,7 @@ func (s *server) StoreTransaction(ctx context.Context, request *pb.TransactionRe
 	rep := &pb.TransactionReply{Completed:true}
 	// Storing the transaction into the database
 	db.StoreTransaction(request)
+	fmt.Println("stored in db")
 	// Credit or debit the balance by sending a new request to BalanceService
 	balanceRequest := &balance.BalanceRequest{
 		AccountID:request.AccountID,

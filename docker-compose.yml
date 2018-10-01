@@ -19,6 +19,8 @@ services:
       - moneway-transaction:transaction
     depends_on:
       - scylla
+      - moneway-transaction
+      - moneway-balance
     restart: always
   moneway-balance:
     build:
@@ -32,3 +34,5 @@ services:
       dockerfile: ./transaction/Dockerfile
     ports:
       - "3000:3000"
+    depends_on:
+      - moneway-balance

@@ -57,9 +57,9 @@ func storeTransaction(c *gin.Context) {
 	req.CreatedAt = ptypes.TimestampNow()
 	res, err := transactionClient.StoreTransaction(c, req)
 	if err == nil && res.Completed {
-		c.JSON(http.StatusOK, fmt.Sprintf("Transaction correclty %s.", storedMethod))
+		c.JSON(http.StatusOK, fmt.Sprintf("Transaction correctly %s.", storedMethod))
 	} else {
-		c.JSON(http.StatusInternalServerError, "Could not process the transaction.")
+		c.JSON(http.StatusInternalServerError, "Could not process the transaction. " + err.Error())
 	}
 }
 

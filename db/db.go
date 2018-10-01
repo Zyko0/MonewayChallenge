@@ -3,11 +3,22 @@ package db
 import (
 	"github.com/gocql/gocql"
 	"log"
-	"fmt"
 	"github.com/Zyko0/MonewayChallenge/transaction/pb"
 	"github.com/scylladb/gocqlx/qb"
 	"github.com/scylladb/gocqlx"
+	"github.com/golang/protobuf/ptypes/timestamp"
+	"math/rand"
 )
+
+type TransactionDB struct {
+	id int64 `db:"id"`
+	accountID string `db:"accountid"`
+	createdAt timestamp.Timestamp `db:"createdat"`
+	description string `db:"description"`
+	amount int64 `db:"amount"`
+	currency string `db:"currency"`
+	notes string `db:"notes"`
+}
 
 var session gocql.Session
 
@@ -37,15 +48,28 @@ CREATE TABLE IF NOT EXISTS moneway.balances (
 )
 `
 
-func StoreTransaction(req *pb.TransactionRequest) {
+func StoreTransaction(req *pb.TransactionRequest) (*pb.TransactionRequest, error){
+	if req.ID == -1 {
+		req.ID = int64(rand.Intn(150000)) // Should be gocql.RandomUUID() but since i didnt set up any pb with strings as ids..
+	}
+	obj := &TransactionDB{
+		id:req.ID,
+		accountID:req.AccountID,
+		createdAt:*req.CreatedAt,
+		description:req.Description,
+		amount:req.Amount,
+		currency:req.Currency,
+		notes:req.Notes,
+	}
 	stmt, names := qb.Insert("moneway.transactions").
 		Columns("id", "accountid", "createdat", "description", "amount", "currency", "notes").
 		ToCql()
 
-	err := gocqlx.Query(session.Query(stmt), names).BindStruct(req).ExecRelease()
+	err := gocqlx.Query(session.Query(stmt), names).BindStruct(obj).ExecRelease()
 	if err != nil {
 		log.Fatal(err)
 	}
+	return req, nil
 }
 
 func Init() {
@@ -59,7 +83,6 @@ func Init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("CONNECTED")
 	session.Query(transactionBaseQuery).Iter()
 	session.Query(balanceBaseQuery).Iter()
 }
